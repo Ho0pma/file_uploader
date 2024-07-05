@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    env_file:
+      - environments/postgres.env
+#    environment:
+#      POSTGRES_DB: django_db
+#      POSTGRES_USER: user
+#      POSTGRES_PASSWORD: pass
+    volumes:
+      - django_db_volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
+
+  celery_worker:
+    build:
+      context: .
+    command: celery -A file_uploader worker --loglevel=info
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+
+  web:
+    build:
+      context: .
+    command: >
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+      - celery_worker
+
+volumes:
+  django_db_volume:
+  redis:
