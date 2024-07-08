@@ -15,5 +15,10 @@ def process_file(file_id):
         file_obj.processed = True
         file_obj.save()
 
+        return {
+            'status': 'success',
+            'message': 'File processing completed successfully.'
+        }
+
     except File.DoesNotExist:
         return 'FileDoesNotExist'

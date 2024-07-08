@@ -15,4 +15,6 @@ RUN pip install -r requirements.txt
 COPY . /code/
 
 # Определяем команду для запуска приложения
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "file_uploader.wsgi:application"]
+
